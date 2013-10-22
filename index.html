@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Browser Dance Party</title>
+
+		<meta name="description" content="Browser Dance Party">
+		<meta name="author" content="Jordan Santell">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="vendor/styles/reveal.css">
+		<link rel="stylesheet" href="css/theme.css">
+		<link rel="stylesheet" href="vendor/styles/prettify.css">
+		<link rel="stylesheet" href="vendor/styles/font-awesome.css">
+
+		<!--[if lt IE 9]>
+		<script src="vendor/scripts/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Browser Dance Party</h1>
+					<h3>HTML5 Audio Visualizers</h3>
+					<p>
+						<a href="http://jsantell.com">
+							Jordan Santell
+						</a> /
+						<a href="http://twitter.com/jsantell">
+							@jsantell
+						</a>
+					</p>
+				</section>
+
+				<section>
+					<h1>Who is this guy</h1>
+					<img class="left" src="images/redpandalasers.gif"/>
+					<ul class="right">
+						<li>Mozilla Addon-SDK</li>
+						<li><a href="http://github.com/jsantell/dancer.js">dancer.js</a> creator</li>
+						<li><a href="http://github.com/web-audio-components/">web audio components</a> </li>
+					</ul>
+				</section>
+
+				<section>
+					<h1>Goals</h1>
+					<ul>
+						<li>Using Web Audio API</li>
+						<li>Digital Signal Processing basics</li>
+						<li>Common Visualizer techniques</li>
+						<li>Implementing your own Visualizer with the Web Audio API</li>
+					</ul>
+				</section>
+
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal complete">Visualizers</div>
+						<div class="goal complete">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal complete">Web Audio API</div>
+						<div class="goal complete">Buffer Node</div>
+						<div class="goal complete">Analyser Node</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal complete">DSP</div>
+						<div class="goal complete">Time Domain</div>
+						<div class="goal complete">Freq. Domain</div>
+					</div>
+				</section>
+
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal active">Visualizers</div>
+						<div class="goal">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal">Web Audio API</div>
+						<div class="goal">Buffer Node</div>
+						<div class="goal">Analyser Node</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal">DSP</div>
+						<div class="goal">Time Domain</div>
+						<div class="goal">Freq. Domain</div>
+					</div>
+				</section>
+
+				<section>
+					<h1>Visualizers</h1>
+					<video controls>
+						<source src="videos/itunes.webm" type='video/webm' />
+						<source src="videos/itunes.mp4" type='video/mp4' />
+						HTML5 Video not supported
+					</video>
+				</section>
+				<section>
+					<h1>Visualizers</h1>
+					<ul>
+						<li>Procedurally generated using audio data</li>
+						<li>Deterministic or non-deterministic</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Visualizers</h1>
+					<video controls>
+						<source src="videos/monstercat.webm" type='video/webm' />
+						<source src="videos/monstercat.mp4" type='video/mp4' />
+						HTML5 Video not supported
+					</video>
+				</section>
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal complete">Visualizers</div>
+						<div class="goal">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal active">Web Audio API</div>
+						<div class="goal">Buffer Node</div>
+						<div class="goal">Analyser Node</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal">DSP</div>
+						<div class="goal">Time Domain</div>
+						<div class="goal">Freq. Domain</div>
+					</div>
+				</section>
+				<section>
+					<h1>Web Audio API Nodes</h1>
+					<ul class="float-column">
+						<li class="title">Source</li>
+						<li>Media Element</li>
+						<li>Media Stream</li>
+						<li>Oscillator</li>
+						<li>Buffer</li>
+					</ul>
+					<ul class="float-column">
+						<li class="title">Utility</li>
+						<li>Script Proc.</li>
+						<li>Analyser</li>
+						<li>Chan. Splitter</li>
+						<li>Chan. Merger</li>
+					</ul>
+					<ul class="float-column">
+						<li class="title">Effect</li>
+						<li>Gain</li>
+						<li>Biquad Filter</li>
+						<li>Delay</li>
+						<li>Convolver</li>
+						<li>Compressor</li>
+						<li>WaveShaper</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Web Audio API Nodes</h1>
+					<ul class="float-column">
+						<li class="title">Source</li>
+						<li>Media Element</li>
+						<li>Media Stream</li>
+						<li>Oscillator</li>
+						<li class="highlight">Buffer</li>
+					</ul>
+					<ul class="float-column">
+						<li class="title">Utility</li>
+						<li>Script Proc.</li>
+						<li class="highlight">Analyser</li>
+						<li>Chan. Splitter</li>
+						<li>Chan. Merger</li>
+					</ul>
+					<ul class="float-column">
+						<li class="title">Effect</li>
+						<li>Gain</li>
+						<li>Biquad Filter</li>
+						<li>Delay</li>
+						<li>Convolver</li>
+						<li>Compressor</li>
+						<li>WaveShaper</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Web Audio API</h1>
+					<img src="images/guitar-route-1.png" />
+				</section>
+				<section>
+					<h1>Web Audio API</h1>
+					<img src="images/guitar-route-web-audio.png" />
+				</section>
+				<section>
+					<h1>Simple Route</h1>
+					<pre>
+var ctx = new AudioContext();
+var dest = ctx.destination;
+var osc = ctx.createOscillator();
+var gain = ctx.createGain();
+osc.connect(gain);
+gain.connect(dest);
+osc.start(0);
+					</pre>
+				</section>
+				<section>
+					<h1>Web Audio API</h1>
+					<img src="images/band-route-1.png" />
+				</section>
+				<section>
+					<h1>Web Audio API</h1>
+					<img src="images/band-route-web-audio.png" />
+				</section>
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal complete">Visualizers</div>
+						<div class="goal">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal complete">Web Audio API</div>
+						<div class="goal active">Buffer Node</div>
+						<div class="goal">Analyser Node</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal">DSP</div>
+						<div class="goal">Time Domain</div>
+						<div class="goal">Freq. Domain</div>
+					</div>
+				</section>
+				<section>
+					<h1>Buffer Source</h1>
+					<ul>
+						<li>Getting array buffers via XHR</li>
+						<li>Audio files are binary!</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Array Buffers</h1>
+					<pre>
+function getBuffer (url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.responsetype = 'arraybuffer';
+  xhr.onload = function () {
+    callback(xhr.response);
+  }
+}
+					</pre>
+				</section>
+				<section>
+					<h1>Decoding Buffers</h1>
+					<pre>
+function decode (url, cb) {
+  getBuffer(url, function (buffer) {
+    ctx.decodeAudioData(buffer, cb);
+  });
+}
+					</pre>
+				</section>
+				<section>
+					<h1>Playing Buffers</h1>
+					<pre>
+var ctx = new AudioContext();
+var source = ctx.createBufferSource();
+decode('jams.ogg', decodedBuffer => {
+  source.buffer = decodedBuffer;
+  source.connect(ctx.destination);
+  source.start(0);
+});
+					</pre>
+				</section>
+				<section>
+					<h1>Buffer + Filter</h1>
+					<input type="range" step="10" id="demo-buffer-slider" min="200" max="2000" />
+					<div id="demo-buffer-feedback" class="feedback"></div>
+					<a href="#" id="demo-buffer-controls" class="btn control-button">
+						<i class="icon-play icon-4x"></i>
+					</a>
+				</section>
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal complete">Visualizers</div>
+						<div class="goal">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal complete">Web Audio API</div>
+						<div class="goal complete">Buffer Node</div>
+						<div class="goal">Analyser Node</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal active">DSP</div>
+						<div class="goal">Time Domain</div>
+						<div class="goal">Freq. Domain</div>
+					</div>
+				</section>
+				<section>
+					<h1>Digital Signal<br />Processing</h1>
+					<img src="images/dsp.jpg" />
+				</section>
+				<section>
+					<h1>DSP</h1>
+					<ul>
+						<li>Continuous -> discrete signal</li>
+					</ul>
+					</section>
+				<section>
+					<h1>Sample Rate</h1>
+					<img src="images/samplerate.jpg" />
+				</section>
+				<section>
+					<h1>Bit Rate</h1>
+					<img src="images/bitrate.jpg" />
+				</section>
+			</div>
+		</div>
+
+		<script src="build/build.js"></script>
+
+	</body>
+</html>
