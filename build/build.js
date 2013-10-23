@@ -9,20 +9,28 @@ var MAX_UINT8 = 255;
 function FFT (ctx, options) {
   var module = this;
   this.canvas = options.canvas;
+  this.onBeat = options.onBeat;
+  this.offBeat = options.offBeat;
   this.type = options.type || 'frequency';
   this.spacing = options.spacing || 1;
   this.width = options.width || 1;
-  this.count = options.count || 1024;
+  this.count = options.count || 512;
   this.input = this.output = ctx.createAnalyser();
   this.proc = ctx.createScriptProcessor(256, 1, 1);
   this.data = new Uint8Array(this.input.frequencyBinCount);
   this.ctx = this.canvas.getContext('2d');
+
+  this.decay = options.decay || 0.002;
+  this.threshold = options.threshold || 0.5;
+  this.range = options.range || [0, this.data.length-1];
+  this.wait = options.wait || 512;
 
   this.h = this.canvas.height;
   this.w = this.canvas.width;
 
   this.input.connect(this.proc);
   this.proc.onaudioprocess = process.bind(null, module);
+  this.ctx.lineWidth = module.width;
 }
 
 FFT.prototype.connect = function (node) {
@@ -31,15 +39,18 @@ FFT.prototype.connect = function (node) {
 }
 
 function process (module) {
+  
   var ctx = module.ctx;
   var data = module.data;
   ctx.clearRect(0, 0, module.w, module.h);
-  ctx.fillStyle = '#000000';
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = module.width;
+  ctx.fillStyle = module.fillStyle || '#000000';
+  ctx.strokeStyle = module.strokeStyle || '#000000';
 
   if (module.type === 'frequency') {
     module.input.getByteFrequencyData(data);
+    // Abort if no data coming through, quick hack, needs fixed
+    if (module.data[3] < 5) return;
+
     for (var i= 0, l = data.length; i < l && i < module.count; i++) {
       ctx.fillRect(
         i * (module.spacing + module.width),
@@ -51,6 +62,8 @@ function process (module) {
   }
   else if (module.type === 'time') {
     module.input.getByteTimeDomainData(data);
+    // Abort if no data coming through, quick hack, needs fixed
+    if (module.data[3] < 5) return;
     ctx.beginPath();
     ctx.moveTo(0, module.h / 2);
     for (var i= 0, l = data.length; i < l && i < module.count; i++) {
@@ -62,6 +75,35 @@ function process (module) {
     ctx.stroke();
     ctx.closePath();
   }
+ 
+  if (!module.onBeat) return;
+ 
+  var min = module.range[0];
+  var max = module.range[1];
+  var threshold = module.threshold;
+  var decay = module.decay;
+  var wait = module.wait;
+  var currentWait = module.currentWait || wait;
+  var current = reduceMagnitude(data, min, max, function (total, mag) {
+    return mag + total;
+  }, 0);
+
+  if (current > threshold) {
+    module.onBeat(current);
+    module.threshold = current;
+    module.currentWait = wait;
+  } else {
+    module.threshold -= decay;
+    module.currentWait -= 1;
+    if (module.offBeat) module.offBeat(current);
+  }
+}
+
+function reduceMagnitude (array, min, max, reducer, init) {
+  var aggregate = init;
+  for (var i = min; i < max + 1; i++)
+    aggregate = reducer(aggregate, array[i]);
+  return aggregate / MAX_UINT8 / (max - min + 1);
 }
 
 module.exports = FFT;
@@ -87,7 +129,7 @@ function URL (url) {
   return './' + url + (allen.canPlayType('mp3') ? '.mp3' : '.ogg');
 }
 
-},{"./context":3,"allen":9,"when":11}],3:[function(require,module,exports){
+},{"./context":3,"allen":8,"when":10}],3:[function(require,module,exports){
 var ctx = new (window.AudioContext || window.webkitAudioContext)();
 
 // Bind to window for live demos
@@ -95,47 +137,16 @@ window.ctx = ctx;
 module.exports = ctx;
 
 },{}],4:[function(require,module,exports){
-var CHANNELS = 2;
-var BUFFER_SIZE = 1024;
-function Crusher (ctx, options) {
-  var module = this;
-  var proc = ctx.createScriptProcessor(BUFFER_SIZE, CHANNELS, CHANNELS);
-  this.input = this.output = proc;
-  this.depth = 1;
-  proc.onaudioprocess = function (e) {
-    for (var i = 0; i < CHANNELS; i++) {
-      crush(e.inputBuffer.getChannelData(i), e.outputBuffer.getChannelData(i), module.depth);
-    }
-  };
-}
-
-Crusher.prototype.connect = function (node) {
-  this.output.connect(node);
-};
-
-function round (f) { return f > 0 ? Math.floor(f + 0.5) : Math.ceil(f - 0.5); }
-
-function crush (input, output, depth) {
-  var max = Math.pow(2, depth);
-  for (var i = 0; i < input.length; i++) {
-    output[i] = round((input[i] + 1) * max) / max - 1;
-  }
-}
-
-module.exports = Crusher;
-
-},{}],5:[function(require,module,exports){
 var ctx = require('./context');
 var createBufferControls = require('./ui').createBufferControls;
 var createOscillatorControls = require('./ui').createOscillatorControls;
 var $ = require('./utils').$;
-var dest = ctx.destination;
-var Crusher = require('./crusher');
 var FFT = require('./FFT');
 
 /**
  * Buffer Node Demo
  */
+/*
 (function () {
   var filter = ctx.createBiquadFilter();
   filter.type.value = 0;
@@ -153,6 +164,7 @@ var FFT = require('./FFT');
     $feedback.innerHTML = $slider.value;
   });
 })();
+*/
 
 // Oscillator Canvas Demo
 (function () {
@@ -160,6 +172,7 @@ var FFT = require('./FFT');
   var fft = new FFT(ctx, {
     type: 'time',
     width: 2,
+    count: 512,
     canvas: $('#canvas-oscillator')
   });
   fft.connect(ctx.destination);
@@ -202,6 +215,7 @@ var FFT = require('./FFT');
   var fft = new FFT(ctx, {
     type: 'time',
     width: 2,
+    count: 512,
     canvas: $('#canvas-timedomain')
   });
   fft.connect(ctx.destination);
@@ -217,6 +231,7 @@ var FFT = require('./FFT');
 (function () {
   var fft = new FFT(ctx, {
     type: 'frequency',
+    count: 512,
     canvas: $('#canvas-frequencydomain')
   });
   fft.connect(ctx.destination);
@@ -226,7 +241,59 @@ var FFT = require('./FFT');
   });
 })();
 
-},{"./FFT":1,"./context":3,"./crusher":4,"./ui":7,"./utils":8}],6:[function(require,module,exports){
+/**
+ * Beat Detection Demo
+ */
+(function () {
+  var canvas = $('#canvas-beat');
+  var canvasCtx = canvas.getContext('2d');
+  var fft = new FFT(ctx, {
+    type: 'frequency',
+    count: 512,
+    canvas: canvas,
+    onBeat: onBeat,
+    offBeat: offBeat,
+    threshold: 0.97,
+    decay: 0.001,
+    wait: 1,
+    range: [2,5]
+  });
+  fft.connect(ctx.destination);
+
+  createBufferControls('audio/beat', '#demo-beat-controls', function (bufferNode) {
+    bufferNode.connect(fft.input);
+  });
+
+  canvasCtx.lineWidth = 5;
+  function onBeat (mag) {
+    fft.fillStyle = '#ff0077';
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, -(fft.h/255) * mag);
+    canvasCtx.lineTo(fft.w, -(fft.h/255) * mag);
+  }
+
+  function offBeat (mag) {
+    canvasCtx.strokeStyle = '#00ff00';
+    // Draw current average energy
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, fft.h - (mag*fft.h));
+    canvasCtx.lineTo(fft.w, fft.h - (mag*fft.h));
+    canvasCtx.stroke();
+    canvasCtx.closePath();
+
+    // Draw decay threshold
+    canvasCtx.strokeStyle = '#ff0077';
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, fft.h - (fft.threshold*fft.h));
+    canvasCtx.lineTo(fft.w, fft.h - (fft.threshold*fft.h));
+    canvasCtx.stroke();
+    canvasCtx.closePath();
+    fft.fillStyle = '#000000';
+  }
+})();
+
+
+},{"./FFT":1,"./context":3,"./ui":6,"./utils":7}],5:[function(require,module,exports){
 var Reveal = require('reveal');
 var prettify = require('prettify');
 require('./demo');
@@ -243,7 +310,7 @@ Reveal.initialize({
   transition: 'fade'
 });
 
-},{"./demo":5,"prettify":"zlxLos","reveal":"HgD3iN"}],7:[function(require,module,exports){
+},{"./demo":4,"prettify":"zlxLos","reveal":"HgD3iN"}],6:[function(require,module,exports){
 var $ = require('./utils').$;
 var ctx = require('./context');
 var createBufferSource = require('./audio-utils').createBufferSource;
@@ -309,10 +376,10 @@ function setState ($el, currentState) {
   $el.classList.add(currentState);
 }
 
-},{"./audio-utils":2,"./context":3,"./utils":8}],8:[function(require,module,exports){
+},{"./audio-utils":2,"./context":3,"./utils":7}],7:[function(require,module,exports){
 var $ = exports.$ = document.querySelector.bind(document);
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*
  * allen - v0.1.5 - 2013-01-27
  * http://github.com/jsantell/allen
@@ -439,7 +506,7 @@ var $ = exports.$ = document.querySelector.bind(document);
 
 }).call(this);
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -493,7 +560,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var process=require("__browserify_process");/** @license MIT License (c) copyright 2011-2013 original author or authors */
 
 /**
@@ -1421,7 +1488,7 @@ define(function (require) {
 });
 })(typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); }, this);
 
-},{"__browserify_process":10}],"prettify":[function(require,module,exports){
+},{"__browserify_process":9}],"prettify":[function(require,module,exports){
 module.exports=require('zlxLos');
 },{}],"zlxLos":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
@@ -4255,5 +4322,5 @@ var Reveal = (function(){
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}]},{},[6])
+},{}]},{},[5])
 ;

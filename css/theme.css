@@ -261,7 +261,7 @@ ul.float-column li.highlight, strong {
 /**
  * Hack for getting Font Awesome in Reveal
  */
-.reveal .btn i {
+.reveal .btn i, .reveal i {
   font-style: normal;
   font-size: 100%;
   border: 0px !important;
@@ -270,3 +270,23 @@ ul.float-column li.highlight, strong {
 canvas {
   background-color: #fff;
 }
+
+ul.browsers li { height: 50px; width: 900px; margin-left: 100px;}
+ul.browsers li div {
+  height: 50px;
+  display: block;
+  float: left;
+  background-repeat: no-repeat;
+}
+ul.browsers div.browsers {
+  width: 100px;
+}
+ul.browsers div.firefox { background-image:url(../images/firefox.png); }
+ul.browsers div.chrome { background-image:url(../images/chrome.png); }
+ul.browsers div.safari { background-image:url(../images/safari.png); }
+ul.browsers div.opera { background-image:url(../images/opera.png); }
+ul.browsers div.ie { background-image:url(../images/ie.png); }
+ul.browsers div span { margin-left: 50px; }
+ul.browsers div i.partial { color: #F2EBBF; }
+ul.browsers div i.full { color: #8CBEB2; }
+ul.browsers div i.notsupported { color: #f06060; }

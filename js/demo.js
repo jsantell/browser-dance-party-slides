@@ -2,13 +2,12 @@ var ctx = require('./context');
 var createBufferControls = require('./ui').createBufferControls;
 var createOscillatorControls = require('./ui').createOscillatorControls;
 var $ = require('./utils').$;
-var dest = ctx.destination;
-var Crusher = require('./crusher');
 var FFT = require('./FFT');
 
 /**
  * Buffer Node Demo
  */
+/*
 (function () {
   var filter = ctx.createBiquadFilter();
   filter.type.value = 0;
@@ -26,6 +25,7 @@ var FFT = require('./FFT');
     $feedback.innerHTML = $slider.value;
   });
 })();
+*/
 
 // Oscillator Canvas Demo
 (function () {
@@ -33,6 +33,7 @@ var FFT = require('./FFT');
   var fft = new FFT(ctx, {
     type: 'time',
     width: 2,
+    count: 512,
     canvas: $('#canvas-oscillator')
   });
   fft.connect(ctx.destination);
@@ -75,6 +76,7 @@ var FFT = require('./FFT');
   var fft = new FFT(ctx, {
     type: 'time',
     width: 2,
+    count: 512,
     canvas: $('#canvas-timedomain')
   });
   fft.connect(ctx.destination);
@@ -90,6 +92,7 @@ var FFT = require('./FFT');
 (function () {
   var fft = new FFT(ctx, {
     type: 'frequency',
+    count: 512,
     canvas: $('#canvas-frequencydomain')
   });
   fft.connect(ctx.destination);
@@ -98,3 +101,55 @@ var FFT = require('./FFT');
     bufferNode.connect(fft.input);
   });
 })();
+
+/**
+ * Beat Detection Demo
+ */
+(function () {
+  var canvas = $('#canvas-beat');
+  var canvasCtx = canvas.getContext('2d');
+  var fft = new FFT(ctx, {
+    type: 'frequency',
+    count: 512,
+    canvas: canvas,
+    onBeat: onBeat,
+    offBeat: offBeat,
+    threshold: 0.97,
+    decay: 0.001,
+    wait: 1,
+    range: [2,5]
+  });
+  fft.connect(ctx.destination);
+
+  createBufferControls('audio/beat', '#demo-beat-controls', function (bufferNode) {
+    bufferNode.connect(fft.input);
+  });
+
+  canvasCtx.lineWidth = 5;
+  function onBeat (mag) {
+    fft.fillStyle = '#ff0077';
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, -(fft.h/255) * mag);
+    canvasCtx.lineTo(fft.w, -(fft.h/255) * mag);
+  }
+
+  function offBeat (mag) {
+    canvasCtx.strokeStyle = '#00ff00';
+    // Draw current average energy
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, fft.h - (mag*fft.h));
+    canvasCtx.lineTo(fft.w, fft.h - (mag*fft.h));
+    canvasCtx.stroke();
+    canvasCtx.closePath();
+
+    // Draw decay threshold
+    canvasCtx.strokeStyle = '#ff0077';
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, fft.h - (fft.threshold*fft.h));
+    canvasCtx.lineTo(fft.w, fft.h - (fft.threshold*fft.h));
+    canvasCtx.stroke();
+    canvasCtx.closePath();
+    fft.fillStyle = '#000000';
+  }
+})();
+
