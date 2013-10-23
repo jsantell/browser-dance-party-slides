@@ -70,6 +70,7 @@
 						<div class="goal complete">Web Audio API</div>
 						<div class="goal complete">Buffer Node</div>
 						<div class="goal complete">Analyser Node</div>
+						<div class="goal complete">Script Processor</div>
 					</div>
 					<div class="map-section map-dsp">
 						<div class="goal complete">DSP</div>
@@ -88,6 +89,7 @@
 						<div class="goal">Web Audio API</div>
 						<div class="goal">Buffer Node</div>
 						<div class="goal">Analyser Node</div>
+						<div class="goal">Script Processor</div>
 					</div>
 					<div class="map-section map-dsp">
 						<div class="goal">DSP</div>
@@ -129,6 +131,7 @@
 						<div class="goal active">Web Audio API</div>
 						<div class="goal">Buffer Node</div>
 						<div class="goal">Analyser Node</div>
+						<div class="goal">Script Processor</div>
 					</div>
 					<div class="map-section map-dsp">
 						<div class="goal">DSP</div>
@@ -173,7 +176,7 @@
 					</ul>
 					<ul class="float-column">
 						<li class="title">Utility</li>
-						<li>Script Proc.</li>
+						<li class="highlight">Script Proc.</li>
 						<li class="highlight">Analyser</li>
 						<li>Chan. Splitter</li>
 						<li>Chan. Merger</li>
@@ -226,6 +229,7 @@ osc.start(0);
 						<div class="goal complete">Web Audio API</div>
 						<div class="goal active">Buffer Node</div>
 						<div class="goal">Analyser Node</div>
+						<div class="goal">Script Processor</div>
 					</div>
 					<div class="map-section map-dsp">
 						<div class="goal">DSP</div>
@@ -293,6 +297,7 @@ decode('jams.ogg', decodedBuffer => {
 						<div class="goal complete">Web Audio API</div>
 						<div class="goal complete">Buffer Node</div>
 						<div class="goal">Analyser Node</div>
+						<div class="goal">Script Processor</div>
 					</div>
 					<div class="map-section map-dsp">
 						<div class="goal active">DSP</div>
@@ -307,17 +312,294 @@ decode('jams.ogg', decodedBuffer => {
 				<section>
 					<h1>DSP</h1>
 					<ul>
-						<li>Continuous -> discrete signal</li>
+						<li>Analog -> Digital</li>
+						<li>Continuous -> Discrete</li>
+						<li>Measure/modify signals</li>
 					</ul>
 					</section>
 				<section>
 					<h1>Sample Rate</h1>
-					<img src="images/samplerate.jpg" />
+					<img src="images/samplerate.png" />
 				</section>
 				<section>
-					<h1>Bit Rate</h1>
-					<img src="images/bitrate.jpg" />
+					<h1>Bit Depth</h1>
+					<img src="images/bitdepth.png" />
 				</section>
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal complete">Visualizers</div>
+						<div class="goal">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal complete">Web Audio API</div>
+						<div class="goal complete">Buffer Node</div>
+						<div class="goal">Analyser Node</div>
+						<div class="goal">Script Processor</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal complete">DSP</div>
+						<div class="goal active">Time Domain</div>
+						<div class="goal">Freq. Domain</div>
+					</div>
+				</section>
+				<section>
+					<h1>Time Domain</h1>
+					<img src="images/soundcloud.png" />
+					<img src="images/audacity1.png"/>
+				</section>
+				<section>
+					<h1>ENHANCE</h1>
+					<img src="images/audacity1.png"/>
+				</section>
+				<section>
+					<h1>ENHANCE</h1>
+					<img src="images/audacity2.png"/>
+				</section>
+				<section>
+					<h1>ENHANCE</h1>
+					<img src="images/audacity3.png"/>
+				</section>
+				<section>
+					<h1>ENHANCE</h1>
+					<img src="images/audacity4.png"/>
+				</section>
+				<section>
+					<h1>Time Domain</h1>
+					<input type="range" step="10" id="demo-oscillator-slider" min="300" max="2000" />
+					<div class="btn-group">
+						<a href="#" id="demo-oscillator-sine" class="btn">
+							<i class="icon-usd icon-rotate-90 icon-4x"></i>
+						</a>
+						<a href="#" id="demo-oscillator-square" class="btn">
+							<i class="icon-stop icon-4x"></i>
+						</a>
+						<a href="#" id="demo-oscillator-sawtooth" class="btn">
+							<i class="icon-bolt icon-rotate-90 icon-4x"></i>
+						</a>
+					</div>
+					<canvas id="canvas-oscillator" width="960px" height="300px"></canvas>
+					<div class="clear"></div>
+					<a href="#" id="demo-oscillator-controls" class="btn control-button">
+						<i class="icon-play icon-4x"></i>
+					</a>
+				</section>
+				<section>
+					<h1>Time Domain</h1>
+					<canvas id="canvas-timedomain" width="960px" height="300px"></canvas>
+					<div class="clear"></div>
+					<a href="#" id="demo-timedomain-controls" class="btn control-button">
+						<i class="icon-play icon-4x"></i>
+					</a>
+				</section>
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal complete">Visualizers</div>
+						<div class="goal">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal complete">Web Audio API</div>
+						<div class="goal complete">Buffer Node</div>
+						<div class="goal">Analyser Node</div>
+						<div class="goal">Script Processor</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal complete">DSP</div>
+						<div class="goal complete">Time Domain</div>
+						<div class="goal active">Freq. Domain</div>
+					</div>
+				</section>
+				<section>
+					<h1>Frequency Domain</h1>
+					<img src="images/equalizer.jpg" />
+				</section>
+				<section>
+					<h1>Fourier Series</h1>
+					<img src="images/fft1.png" />
+				</section>
+				<section>
+					<h1>Fourier Series</h1>
+					<img src="images/fft2.png" />
+				</section>
+				<section>
+					<h1>Fourier Series</h1>
+					<img src="images/fft3.png" />
+				</section>
+				<section>
+					<h1>Fourier Series</h1>
+					<img src="images/fft4.png" />
+				</section>
+				<section>
+					<h1>I Apologize</h1>
+				</section>
+				<section>
+					<h1>Frequency Domain</h1>
+					<canvas id="canvas-frequencydomain" width="960px" height="300px"></canvas>
+					<div class="clear"></div>
+					<a href="#" id="demo-frequencydomain-controls" class="btn control-button">
+						<i class="icon-play icon-4x"></i>
+					</a>
+				</section>
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal complete">Visualizers</div>
+						<div class="goal">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal complete">Web Audio API</div>
+						<div class="goal complete">Buffer Node</div>
+						<div class="goal active">Analyser Node</div>
+						<div class="goal">Script Processor</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal complete">DSP</div>
+						<div class="goal complete">Time Domain</div>
+						<div class="goal complete">Freq. Domain</div>
+					</div>
+				</section>
+				<section>
+					<h1>Analyser Node</h1>
+					<ul>
+						<li>analyser.<strong>getFloatFrequencyData</strong>(array)</li>
+						<li>analyser.<strong>getByteFrequencyData</strong>(array)</li>
+						<li>analyser.<strong>getByteTimeDomainData</strong>(array)</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Frequency Data</h1>
+					<img src="images/fftrender.png" />
+					<ul>
+						<li>nyquist === samplerate / 2</li>
+						<li>binCount === fftSize / 2</li>
+						<li>FFT contains `binCount` elements, representing the frequencies from 0 to nyquist frequency</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Frequency Data</h1>
+					<img src="images/fftrender.png" />
+					<ul>
+						<li>nyquist = 44100 / 2</li>
+						<li>bins = 1024 / 2</li>
+						<li>Each bin contains (22050/512) frequencies, or 43.066</li>
+					</ul>
+					<pre>
+data[0]; // contains 0-43hz
+data[1]; // contains 44-87hz
+					</pre>
+				</section>
+				<section>
+					<h1>Frequency Data</h1>
+					<p>Fill Uint8Array with 8-bit values of fftSize/2</p>
+					<pre>
+var a = ctx.createAnalyser();
+a.fftSize = 512;
+// a.frequencyBinCount == 256
+var freq = new Uint8Array(256);
+setInterval(function () {
+  a.getByteFrequencyData(freq)
+}, 20);
+					</pre>
+				</section>
+				<section>
+					<h1>Time Data</h1>
+					<p>Fill Uint8Array with 8-bit values of fftSize</p>
+					<pre>
+var a = ctx.createAnalyser();
+a.fftSize = 512;
+var data = new Uint8Array(a.fftSize);
+setInterval(function () {
+  a.getByteTimeDomainData(data)
+}, 20);
+					</pre>
+				</section>
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal complete">Visualizers</div>
+						<div class="goal">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal complete">Web Audio API</div>
+						<div class="goal complete">Buffer Node</div>
+						<div class="goal complete">Analyser Node</div>
+						<div class="goal active">Script Processor</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal complete">DSP</div>
+						<div class="goal complete">Time Domain</div>
+						<div class="goal complete">Freq. Domain</div>
+					</div>
+				</section>
+				<section>
+					<h1>Script Processor</h1>
+					<pre>
+var p = ctx.createScriptProcessor(
+  2048, 1, 1
+);
+p.onaudioprocess = function (e) {
+  var buf = e.outputBuffer;
+  var out = buf.getChannelData(0);
+  for (var i=0;i&lt;out.length;i++) {
+    out[i] = Math.random() * 2 -1;
+  }
+};
+					</pre>
+				</section>
+				<section>
+					<h1>Script Processor</h1>
+					<pre>
+var BUFFER_SIZE = 2048;
+var p = ctx.createScriptProcessor(
+  BUFFER_SIZE
+);
+p.onaudioprocess = function (e) {
+  // Called SAMPLE_RATE / BUFFER_SIZE
+  // times a second
+};
+					</pre>
+				</section>
+				<section>
+					<h1>Analyser+Proc</h1>
+					<pre>
+var a = ctx.createAnalyser();
+var p = ctx.createScriptProcessor(
+  2048
+);
+a.fftSize = 1024;
+var fft = new Uint8Array(512);
+					</pre>
+				</section>
+				<section>
+					<h1>Analyser+Proc</h1>
+					<pre>
+p.onaudioprocess = render;
+function render () {
+  a.getByteFrequencyData(fft);
+  // `fft` has 512 elements
+  // containing 8 bit values
+  // every 46ms
+}
+					</pre>
+				</section>
+				<section class="road-map">
+					<h1>Dance Journey</h1>
+					<div class="map-section map-viz">
+						<div class="goal complete">Visualizers</div>
+						<div class="goal active">Techniques</div>
+					</div>
+					<div class="map-section map-imp">
+						<div class="goal complete">Web Audio API</div>
+						<div class="goal complete">Buffer Node</div>
+						<div class="goal complete">Analyser Node</div>
+						<div class="goal complete">Script Processor</div>
+					</div>
+					<div class="map-section map-dsp">
+						<div class="goal complete">DSP</div>
+						<div class="goal complete">Time Domain</div>
+						<div class="goal complete">Freq. Domain</div>
+					</div>
 			</div>
 		</div>
 

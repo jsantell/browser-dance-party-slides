@@ -1,4 +1,72 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var MAX_UINT8 = 255;
+
+/**
+ * Convert to Web Audio Component FFT-visualizer after 
+ * switching to browserify modules
+ */
+
+function FFT (ctx, options) {
+  var module = this;
+  this.canvas = options.canvas;
+  this.type = options.type || 'frequency';
+  this.spacing = options.spacing || 1;
+  this.width = options.width || 1;
+  this.count = options.count || 1024;
+  this.input = this.output = ctx.createAnalyser();
+  this.proc = ctx.createScriptProcessor(256, 1, 1);
+  this.data = new Uint8Array(this.input.frequencyBinCount);
+  this.ctx = this.canvas.getContext('2d');
+
+  this.h = this.canvas.height;
+  this.w = this.canvas.width;
+
+  this.input.connect(this.proc);
+  this.proc.onaudioprocess = process.bind(null, module);
+}
+
+FFT.prototype.connect = function (node) {
+  this.output.connect(node);
+  this.proc.connect(node);
+}
+
+function process (module) {
+  var ctx = module.ctx;
+  var data = module.data;
+  ctx.clearRect(0, 0, module.w, module.h);
+  ctx.fillStyle = '#000000';
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = module.width;
+
+  if (module.type === 'frequency') {
+    module.input.getByteFrequencyData(data);
+    for (var i= 0, l = data.length; i < l && i < module.count; i++) {
+      ctx.fillRect(
+        i * (module.spacing + module.width),
+        module.h,
+        module.width,
+        -(module.h / MAX_UINT8) * data[i]
+      );
+    }
+  }
+  else if (module.type === 'time') {
+    module.input.getByteTimeDomainData(data);
+    ctx.beginPath();
+    ctx.moveTo(0, module.h / 2);
+    for (var i= 0, l = data.length; i < l && i < module.count; i++) {
+      ctx.lineTo(
+        i * (module.spacing + module.width),
+        (module.h / MAX_UINT8) * data[i]
+      );
+    }
+    ctx.stroke();
+    ctx.closePath();
+  }
+}
+
+module.exports = FFT;
+
+},{}],2:[function(require,module,exports){
 var defer = require('when').defer;
 var allen = require('allen');
 var ctx = require('./context');
@@ -19,18 +87,51 @@ function URL (url) {
   return './' + url + (allen.canPlayType('mp3') ? '.mp3' : '.ogg');
 }
 
-},{"./context":2,"allen":7,"when":9}],2:[function(require,module,exports){
+},{"./context":3,"allen":9,"when":11}],3:[function(require,module,exports){
 var ctx = new (window.AudioContext || window.webkitAudioContext)();
 
 // Bind to window for live demos
 window.ctx = ctx;
 module.exports = ctx;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
+var CHANNELS = 2;
+var BUFFER_SIZE = 1024;
+function Crusher (ctx, options) {
+  var module = this;
+  var proc = ctx.createScriptProcessor(BUFFER_SIZE, CHANNELS, CHANNELS);
+  this.input = this.output = proc;
+  this.depth = 1;
+  proc.onaudioprocess = function (e) {
+    for (var i = 0; i < CHANNELS; i++) {
+      crush(e.inputBuffer.getChannelData(i), e.outputBuffer.getChannelData(i), module.depth);
+    }
+  };
+}
+
+Crusher.prototype.connect = function (node) {
+  this.output.connect(node);
+};
+
+function round (f) { return f > 0 ? Math.floor(f + 0.5) : Math.ceil(f - 0.5); }
+
+function crush (input, output, depth) {
+  var max = Math.pow(2, depth);
+  for (var i = 0; i < input.length; i++) {
+    output[i] = round((input[i] + 1) * max) / max - 1;
+  }
+}
+
+module.exports = Crusher;
+
+},{}],5:[function(require,module,exports){
 var ctx = require('./context');
-var createControls = require('./ui').createControls;
+var createBufferControls = require('./ui').createBufferControls;
+var createOscillatorControls = require('./ui').createOscillatorControls;
 var $ = require('./utils').$;
 var dest = ctx.destination;
+var Crusher = require('./crusher');
+var FFT = require('./FFT');
 
 /**
  * Buffer Node Demo
@@ -41,7 +142,7 @@ var dest = ctx.destination;
   filter.frequency.value = 22100;
   filter.connect(dest);
 
-  createControls('audio/zircon-augment', '#demo-buffer-controls', function (bufferNode) {
+  createBufferControls('audio/zircon-augment', '#demo-buffer-controls', function (bufferNode) {
     bufferNode.connect(filter);
   });
 
@@ -53,8 +154,79 @@ var dest = ctx.destination;
   });
 })();
 
+// Oscillator Canvas Demo
+(function () {
+  var oscNode, type, freq;
+  var fft = new FFT(ctx, {
+    type: 'time',
+    width: 2,
+    canvas: $('#canvas-oscillator')
+  });
+  fft.connect(ctx.destination);
 
-},{"./context":2,"./ui":5,"./utils":6}],4:[function(require,module,exports){
+  createOscillatorControls('#demo-oscillator-controls', function (osc) {
+    osc.type = type || 'sine';
+    osc.frequency.value = freq || 440;
+    osc.connect(fft.input);
+    oscNode = osc;
+  });
+  var $sine = $('#demo-oscillator-sine');
+  var $square = $('#demo-oscillator-square');
+  var $sawtooth = $('#demo-oscillator-sawtooth');
+
+  // Recreate the oscillator node on click, work around for
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=929621
+  [$sine, $square, $sawtooth].map(function ($el) {
+    $el.addEventListener('click', function (e) {
+      e.preventDefault();
+      type = $el.id.replace(/demo-oscillator-/,'');
+      if ($('#demo-oscillator-controls i').classList.contains('icon-stop')) {
+        $('#demo-oscillator-controls').click();
+      }
+      $('#demo-oscillator-controls').click();
+    });
+  });
+ 
+  var $slider = $('#demo-oscillator-slider');
+  $slider.addEventListener('change', function () {
+    freq = $slider.value;
+    if (!oscNode) return;
+    oscNode.frequency.value = freq;
+  });
+})();
+
+/**
+ * Time Domain Demo
+ */
+(function () {
+  var fft = new FFT(ctx, {
+    type: 'time',
+    width: 2,
+    canvas: $('#canvas-timedomain')
+  });
+  fft.connect(ctx.destination);
+
+  createBufferControls('audio/zircon-augment', '#demo-timedomain-controls', function (bufferNode) {
+    bufferNode.connect(fft.input);
+  });
+})();
+
+/**
+ * Frequency Domain Demo
+ */
+(function () {
+  var fft = new FFT(ctx, {
+    type: 'frequency',
+    canvas: $('#canvas-frequencydomain')
+  });
+  fft.connect(ctx.destination);
+
+  createBufferControls('audio/zircon-augment', '#demo-frequencydomain-controls', function (bufferNode) {
+    bufferNode.connect(fft.input);
+  });
+})();
+
+},{"./FFT":1,"./context":3,"./crusher":4,"./ui":7,"./utils":8}],6:[function(require,module,exports){
 var Reveal = require('reveal');
 var prettify = require('prettify');
 require('./demo');
@@ -71,8 +243,9 @@ Reveal.initialize({
   transition: 'fade'
 });
 
-},{"./demo":3,"prettify":"zlxLos","reveal":"HgD3iN"}],5:[function(require,module,exports){
+},{"./demo":5,"prettify":"zlxLos","reveal":"HgD3iN"}],7:[function(require,module,exports){
 var $ = require('./utils').$;
+var ctx = require('./context');
 var createBufferSource = require('./audio-utils').createBufferSource;
 var PLAYING = 'icon-play';
 var STOPPED = 'icon-stop';
@@ -82,7 +255,7 @@ var LOADING = 'icon-time';
  * Creates a play/pause button, creating and destroying the
  * buffer node to reconnect into the chain
  */
-exports.createControls = function createControls (bufferUrl, selector, callback) {
+exports.createBufferControls = function createBufferControls (bufferUrl, selector, callback) {
   var $element = $(selector);
   var bufferNode;
   $element.addEventListener('click', function (e) {
@@ -104,6 +277,24 @@ exports.createControls = function createControls (bufferUrl, selector, callback)
   });
 };
 
+exports.createOscillatorControls = function createOscillatorControls (selector, callback) {
+  var $element = $(selector);
+  var osc;
+  $element.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (osc && isPlaying($element)) {
+      osc.disconnect();
+      osc.stop(0);
+      stopControl($element);
+    } else {
+      osc = ctx.createOscillator();
+      callback(osc);
+      osc.start(0);
+      playControl($element);
+    }
+  });
+};
+
 function isLoading ($el) { return getIcon($el).classList.contains(LOADING); }
 function isPlaying ($el) { return getIcon($el).classList.contains(STOPPED); }
 function getIcon ($el) { return $el.children[0]; }
@@ -118,10 +309,10 @@ function setState ($el, currentState) {
   $el.classList.add(currentState);
 }
 
-},{"./audio-utils":1,"./utils":6}],6:[function(require,module,exports){
+},{"./audio-utils":2,"./context":3,"./utils":8}],8:[function(require,module,exports){
 var $ = exports.$ = document.querySelector.bind(document);
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /*
  * allen - v0.1.5 - 2013-01-27
  * http://github.com/jsantell/allen
@@ -248,7 +439,7 @@ var $ = exports.$ = document.querySelector.bind(document);
 
 }).call(this);
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -302,7 +493,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var process=require("__browserify_process");/** @license MIT License (c) copyright 2011-2013 original author or authors */
 
 /**
@@ -1230,7 +1421,7 @@ define(function (require) {
 });
 })(typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); }, this);
 
-},{"__browserify_process":8}],"prettify":[function(require,module,exports){
+},{"__browserify_process":10}],"prettify":[function(require,module,exports){
 module.exports=require('zlxLos');
 },{}],"zlxLos":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
@@ -4064,5 +4255,5 @@ var Reveal = (function(){
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}]},{},[4])
+},{}]},{},[6])
 ;

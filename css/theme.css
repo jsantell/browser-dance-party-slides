@@ -42,7 +42,7 @@ section.road-map .map-dsp .goal.active {
 section.road-map .goal {
   height: 80px;
   padding-top: 20px;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.20);
   background-color: #666;
@@ -89,7 +89,7 @@ ul.float-column li.title {
   color: #8cbeb2;
 }
 
-ul.float-column li.highlight {
+ul.float-column li.highlight, strong {
   font-weight: bold;
   color: #f06060;
 }
@@ -221,6 +221,21 @@ ul.float-column li.highlight {
   color: #000;
 }
 
+.reveal .btn-group {
+  margin: 0 auto;
+  width: 460px;
+  display: block;
+}
+.reveal .clear { clear:both; }
+
+.reveal .btn-group a.btn {
+  font-size: 100%;
+  display: block;
+  float: left;
+  width: 150px;
+  color: #000;
+}
+
 .reveal a.control-button.playing {
   color: #00ff00;
 }
@@ -252,3 +267,6 @@ ul.float-column li.highlight {
   border: 0px !important;
 }
 
+canvas {
+  background-color: #fff;
+}

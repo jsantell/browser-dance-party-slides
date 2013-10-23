@@ -1,4 +1,5 @@
 var $ = require('./utils').$;
+var ctx = require('./context');
 var createBufferSource = require('./audio-utils').createBufferSource;
 var PLAYING = 'icon-play';
 var STOPPED = 'icon-stop';
@@ -8,7 +9,7 @@ var LOADING = 'icon-time';
  * Creates a play/pause button, creating and destroying the
  * buffer node to reconnect into the chain
  */
-exports.createControls = function createControls (bufferUrl, selector, callback) {
+exports.createBufferControls = function createBufferControls (bufferUrl, selector, callback) {
   var $element = $(selector);
   var bufferNode;
   $element.addEventListener('click', function (e) {
@@ -26,6 +27,24 @@ exports.createControls = function createControls (bufferUrl, selector, callback)
         bufferNode.start(0);
         playControl($element);
       });
+    }
+  });
+};
+
+exports.createOscillatorControls = function createOscillatorControls (selector, callback) {
+  var $element = $(selector);
+  var osc;
+  $element.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (osc && isPlaying($element)) {
+      osc.disconnect();
+      osc.stop(0);
+      stopControl($element);
+    } else {
+      osc = ctx.createOscillator();
+      callback(osc);
+      osc.start(0);
+      playControl($element);
     }
   });
 };
