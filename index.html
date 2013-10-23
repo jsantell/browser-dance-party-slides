@@ -363,8 +363,8 @@ function decode (url, cb) {
 					<pre>
 var ctx = new AudioContext();
 var source = ctx.createBufferSource();
-decode('jams.ogg', decodedBuffer => {
-  source.buffer = decodedBuffer;
+decode('f.mp3', function (decoded) {
+  source.buffer = decoded;
   source.connect(ctx.destination);
   source.start(0);
 });
@@ -642,21 +642,6 @@ setInterval(function () {
 				<section>
 					<h1>Script Processor</h1>
 					<pre>
-var p = ctx.createScriptProcessor(
-  2048, 1, 1
-);
-p.onaudioprocess = function (e) {
-  var buf = e.outputBuffer;
-  var out = buf.getChannelData(0);
-  for (var i=0;i&lt;out.length;i++) {
-    out[i] = Math.random() * 2 -1;
-  }
-};
-					</pre>
-				</section>
-				<section>
-					<h1>Script Processor</h1>
-					<pre>
 var BUFFER_SIZE = 2048;
 var p = ctx.createScriptProcessor(
   BUFFER_SIZE
@@ -742,7 +727,7 @@ function getMag(data, min, max) {
 					<pre>
 function process (d) {
   var mag = getMag(d, 0, d.length);
-  if (mag &lt; threshold) beat(mag);
+  if (mag &gt; threshold) beat(mag);
   else {
     threshold -= decayRate;
   }
@@ -774,6 +759,13 @@ function process (d) {
 						<div class="goal complete">Time Domain</div>
 						<div class="goal complete">Freq. Domain</div>
 					</div>
+				</section>
+				<section>
+					<h1>Thanks</h1>
+					<ul>
+						<li>Jordan Santell</li>
+						<li><a href="http://twitter.com/jsantell">@jsantell</a></li>
+					</ul>
 				</section>
 			</div>
 		</div>
