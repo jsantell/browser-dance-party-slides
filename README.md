@@ -17,3 +17,8 @@ Slides for "Browser Dance Party" talk, given at HTML5 Dev Conf Fall 2013.
 * Web Audio API Routing from [W3C](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/images/modular-routing2.png)
 * Monstercat Visualization from [Monstercat](http://www.youtube.com/watch?v=g7rtC0Cjo08&list=UUJ6td3C9QlPO9O_J5dF4ZzA), Televisor's Dream Soda
 
+## TODO
+
+* Build each canvas demo so the script processor isn't constantly running
+* More conclusion
+* Reconsider usage of word "nodes" when dealing with Web Audio route; possibly focus more on signal/transformation aspect
